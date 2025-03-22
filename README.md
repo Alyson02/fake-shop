@@ -1,5 +1,6 @@
 # Fake Shop
 
+Projeto para treinar cloud e kubernets, resultados temporariamente disponiveis no ip: http://206.189.254.102
 
 ## Variável de Ambiente
 DB_HOST	=> Host do banco de dados PostgreSQL.
