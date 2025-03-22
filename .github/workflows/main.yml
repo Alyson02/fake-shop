@@ -1,1 +1,48 @@
+name: CI-CD
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
 
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtendo o código
+        uses: actions/checkout@v4.2.2
+
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Construção e envio da imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src
+          push: true
+          file: ./src/Dockerfile
+          tags: | 
+            alysu/fake-shop:v${{ github.run_number }}
+            alysu/fake-shop
+
+  CD:
+    needs: [CI]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtendo o código
+        uses: actions/checkout@v4.2.2
+
+      - name: Configurando contexto do Kubernetes
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
+
+      - name: Deploy no Kubernetes
+        uses: Azure/k8s-deploy@v5
+        with:
+          manifests: |
+            k8s/deployment.yaml
+          images: alysu/fake-shop:v${{ github.run_number }}
