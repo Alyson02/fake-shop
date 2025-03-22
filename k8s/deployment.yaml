@@ -56,7 +56,7 @@ spec:
           command: ['sh', '-c', 'until nc -z postgre 5432; do echo waiting for database; sleep 2; done;']
       containers:
         - name: fakeshop
-          image: fabricioveronez/fake-shop-desafio:v1
+          image: alysu/fake-shop:v2
           ports:
             - containerPort: 5000
           env:
